@@ -33,9 +33,7 @@ window.Stoarray = (function(){
   function _save(){
 
     if(_events){
-      _triggerEvent('change',{
-        data : this.data
-      });
+      _triggerEvent('change', this.data );
     }
 
     if(_autosave){
@@ -65,15 +63,12 @@ window.Stoarray = (function(){
     if(!(data instanceof Array)){
       data = [data];
     }
-    
+
     for(var i = 0; i<data.length;i++){
       this.data.push(data[i]);
     }
     _save.call(this);
-    _triggerEvent('push',{
-      data : this.data,
-      pushed : data
-    });
+    _triggerEvent('push',this.data, data );
     return this;
   }
 
@@ -94,6 +89,7 @@ window.Stoarray = (function(){
   Stoarray.prototype.save = function(){
     var dataString = JSON.stringify(this.data);
     localStorage.setItem(_name,dataString);
+    _triggerEvent('saved',this.data);
     return this;
   }
 
@@ -125,10 +121,13 @@ window.Stoarray = (function(){
 
   }
 
-  function _triggerEvent(eventName,data){
+  function _triggerEvent(eventName,data,changed){
+
+    if(!_events) return;
+
     if(_eventsCallback[eventName] && _eventsCallback[eventName].length >0){
       for(var i = 0; i<_eventsCallback[eventName].length;i++){
-        _eventsCallback[eventName][i].call(null,data)
+        _eventsCallback[eventName][i].call(null,data,changed)
       }
     }
   }
