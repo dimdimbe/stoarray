@@ -34,7 +34,8 @@ cart.use('filter',fn);
 ```
 
 ### Event Methods
-You can listen to **events** triggered when the array changed
+You can listen to **events** triggered when the array change.
+
 The function take one or two parameters first one is always the array itself and the second one is sometimes what has changed
 ```javascript
 cart.on('change',fn);
@@ -76,6 +77,7 @@ cart.addProduct(0,3,'Stuff');
 ## Motivation
 
 I was tired of handling localstorage when working with arrays.
+
 I also did this to show to student friends how to build javascript *class*.
 
 ## Installation
