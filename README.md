@@ -15,7 +15,8 @@ var cart = new Stoarray('shopping-cart',{
   autosave : true, //save itself after each modification (default: true)
   defaultValues : [{id: 0, name:'Stuff',count: 1}], //use only if the local storage is empty
   ignore : false, //ignore data coming from the store when initialize (default false)
-  debug : false //when true, override ignore to true and autosave to false
+  debug : false, //when true, override ignore to true and autosave to false
+  events : true //emit change event and other (like 'push', etc) events (default: true)
 });
 ```
 ### Array's Methods
@@ -30,6 +31,13 @@ cart.reduce(fn,[]);
 For **other** Array's built in methods, we provide ***use***
 ```javascript
 cart.use('filter',fn);
+```
+
+### Event Methods
+You can listen to **events** triggered when the array changed
+The function take one or two parameters first one is always the array itself and the second one is sometimes what has changed
+```javascript
+cart.on('change',fn);
 ```
 
 ### LocalStorage Methods
