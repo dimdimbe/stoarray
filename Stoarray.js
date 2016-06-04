@@ -1,12 +1,15 @@
 window.Stoarray = (function(){
 
   //private variables
-  var _name,_type,_autosave;
+  var _name,_type,_autosave,_events;
+  var _eventsCallback = {};
 
   //constructor
   var Stoarray = function(name,opts){
     _name = name;
     _autosave = (opts.autosave === undefined)? true : !!opts.autosave;
+    _events = (opts.events === undefined)? true : !!opts.events;
+
 
     var ignore = opts.ignore;
     if(opts.debug){
@@ -28,6 +31,13 @@ window.Stoarray = (function(){
   }
 
   function _save(){
+
+    if(_events){
+      _triggerEvent('change',{
+        data : this.data
+      });
+    }
+
     if(_autosave){
       console.log('autosave')
       this.save();
@@ -58,6 +68,10 @@ window.Stoarray = (function(){
       this.data.push(data[i]);
     }
     _save.call(this);
+    _triggerEvent('push',{
+      data : this.data,
+      pushed : data
+    });
     return this;
   }
 
@@ -95,6 +109,26 @@ window.Stoarray = (function(){
       return this;
     }.bind(this);
     return this;
+  }
+
+  //events methods
+  Stoarray.prototype.on = function(eventName,callback){
+
+    if(_eventsCallback[eventName] && _eventsCallback[eventName] instanceof Array){
+      _eventsCallback[eventName].push(callback)
+    }else{
+      _eventsCallback[eventName] = [callback]
+    }
+    return this;
+
+  }
+
+  function _triggerEvent(eventName,data){
+    if(_eventsCallback[eventName] && _eventsCallback[eventName].length >0){
+      for(var i = 0; i<_eventsCallback[eventName].length;i++){
+        _eventsCallback[eventName][i].call(null,data)
+      }
+    }
   }
 
   return Stoarray;
