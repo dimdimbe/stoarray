@@ -61,9 +61,11 @@ window.Stoarray = (function(){
   }
 
   Stoarray.prototype.push = function(data){
-    if(!data instanceof Array){
+
+    if(!(data instanceof Array)){
       data = [data];
     }
+    
     for(var i = 0; i<data.length;i++){
       this.data.push(data[i]);
     }
