@@ -1,8 +1,9 @@
 window.Stoarray = (function(){
 
   //private variables
-  var _name,_type,_autosave,_events;
+  var _name,_autosave,_events;
   var _eventsCallback = {};
+  var _addedMethods = []
 
   //constructor
   var Stoarray = function(name,opts){
@@ -45,17 +46,23 @@ window.Stoarray = (function(){
   //array data methods
   Stoarray.prototype.use = function(method,fn,autre){
     var newData = this.data[method](fn.bind(this),autre);
-    if(newData){
-      this.data = newData;
-    }
-    return this;
+
+    var newStoarray = new Stoarray(_name, {
+      autosave : false,
+      events : _events,
+      ignore : true,
+      defaultValues : newData
+    });
+
+    _addedMethods.forEach(function(obj){
+      newStoarray.addMethod(obj.name,obj.method)
+    })
+
+    return newStoarray;
   }
 
   Stoarray.prototype.each = function(fn){
-    for(var i = 0; i<this.data.length;i++){
-      fn.call(this);
-    }
-    return this;
+    return this.use('forEach',fn);
   }
 
   Stoarray.prototype.push = function(data){
@@ -73,15 +80,11 @@ window.Stoarray = (function(){
   }
 
   Stoarray.prototype.map = function(fn){
-    this.data = this.data.map(fn.bind(this));
-    _save.call(this);
-    return this;
+    return this.use('map',fn);
   }
 
-  Stoarray.prototype.reduce = function(fn,tab){
-    this.data = this.data.reduce(fn.bind(this),tab);
-    _save.call(this);
-    return this;
+  Stoarray.prototype.reduce = function(fn,a){
+    return this.use('reduce',fn,a);
   }
 
 
@@ -100,7 +103,14 @@ window.Stoarray = (function(){
     return this;
   }
 
+  Stoarray.prototype.clean = function(){
+    this.data = [];
+    this.save();
+    return this;
+  }
+
   Stoarray.prototype.addMethod = function(name,method){
+    _addedMethods.push({name:name,method,method})
     this[name] = function(){
       method.apply(this,arguments);
       _save.call(this);
